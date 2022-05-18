@@ -1,17 +1,17 @@
 <template>
   <base-card>
     <base-button
-        @click="setSelectTab('stored-resources')"
-        :mode="storedResButtonMode"
+      @click="setSelectTab('stored-resources')"
+      :mode="storedResButtonMode"
       >Stored Resources</base-button
     >
-    <base-button 
-        @click="setSelectTab('add-resource')" 
-        :mode="addResButtonMode"
+    <base-button @click="setSelectTab('add-resource')" :mode="addResButtonMode"
       >Add Resources</base-button
     >
   </base-card>
-  <component :is="selectedTab"></component>
+  <keep-alive>
+    <component :is="selectedTab"></component>
+  </keep-alive>
 </template>
 
 <script>
@@ -43,6 +43,7 @@ export default {
   },
   provide() {
     return {
+      addResource: this.addResource,
       resources: this.storedResources,
     };
   },
@@ -51,12 +52,22 @@ export default {
       return this.selectedTab === 'stored-resources' ? null : 'flat';
     },
     addResButtonMode() {
-      return this.selectedTab === 'add-resources' ? null : 'flat';
+      return this.selectedTab === 'add-resource' ? null : 'flat';
     },
   },
   methods: {
     setSelectTab(tab) {
       this.selectedTab = tab;
+    },
+    addResource(title, description, url) {
+      const newResource = {
+        id: new Date().toISOString(),
+        title: title,
+        description: description,
+        link: url,
+      };
+      this.storedResources.unshift(newResource);
+      this.selectedTab = 'stored-resources';
     },
   },
 };
